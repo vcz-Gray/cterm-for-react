@@ -1,7 +1,6 @@
 {
   "name": "cterm-for-react",
   "version": "0.0.1",
-  "private": true,
   "author": {
     "name": "Gray Gyuha Park",
     "email": "gyuhapark11@gmail.com",
@@ -10,6 +9,11 @@
   "module": "dist/Terminal.js",
   "main": "dist/Terminal.js",
   "description": "Web terminal for react.js",
+  "babel": {
+    "presets": [
+      "@babel/preset-react"
+    ]
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
@@ -46,6 +50,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.13.0"
+    "@babel/cli": "^7.13.0",
+    "@babel/preset-react": "^7.12.13"
   }
 }
