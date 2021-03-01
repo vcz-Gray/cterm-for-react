@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { XTerm } from 'xterm-for-react';
 import { initializeUser } from './lib/initializeUser';
 import { initializePath, isUserPath, getRoot } from './lib/initializePath';
@@ -53,6 +53,11 @@ function Terminal(props) {
 		}
 	};
 	const welcomeText = welcome();
+	useEffect(() => {
+		xtermRef.current.terminal.writeln(welcomeText);
+		inputPrompt();
+	}, []);
+
 	return <XTerm ref={xtermRef} onKey={keyboardEventHandler} />;
 }
 
