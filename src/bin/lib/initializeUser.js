@@ -21,11 +21,9 @@ const initializeUser = (props) => {
 	if (result.name === '') {
 		result.name = 'codestates';
 	}
-
 	if (result.githubUserName === '') {
 		result.githubUserName = 'codestates';
 	}
-
 	if (result.dirPath === undefined) {
 		result.dirPath = [];
 	}

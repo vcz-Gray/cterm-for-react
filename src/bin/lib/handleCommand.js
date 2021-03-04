@@ -15,31 +15,50 @@ const splitSemi = (str) => {
 	return result;
 };
 
-const cmd = (user, line) => {
-	const [command, ...args] = line;
-	const presentFolder = user.path[user.path.length - 1].folder;
+const objCmd = (line, user, setUser, cb) => {
+	const lineArr = line.split(' ');
+	let isSudo = false,
+		isFile = false;
+	if (lineArr[0] === 'sudo') {
+		isSudo = true;
+		lineArr.shift();
+	}
+	const [command, ...args] = line.split(' ');
 	switch (command) {
 		case 'mkdir':
-			if (args.length === 0)
-				return new Error('Enter the folder name you want to create');
-			let flag = false;
+			if (args.length === 0) {
+				cb('\r\n');
+				cb('Enter the folder name you want to create');
+				return;
+			}
+			let errorFlag = false;
 			for (let name of args) {
-				if (presentFolder.childLength < 6) {
-					presentFolder.appendChildFolder(name);
+				if (user.path[user.path.length - 1].childLength < 6) {
+					user.path[user.path.length - 1].appendChild(
+						user,
+						name,
+						isSudo,
+						isFile,
+						setUser,
+						cb,
+					);
 				} else {
-					flag = true;
+					errorFlag = true;
 					break;
 				}
 			}
-			if (flag) {
-				return new Error(
+			if (errorFlag) {
+				cb('\r\n');
+				cb(
 					'cannot create new file or folder. this directory limited 5 child which is sum of all files and folders',
 				);
 			}
 			return;
 		default:
-			return 'command not found: ' + command;
+			cb('\r\n');
+			cb('command not found: ' + command);
+			return;
 	}
 };
 
-export { cmd, splitSemi };
+export { objCmd, splitSemi };
