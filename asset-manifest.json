@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.js": "/cterm-for-react/static/js/main.f1714a60.chunk.js",
-    "main.js.map": "/cterm-for-react/static/js/main.f1714a60.chunk.js.map",
+    "main.js": "/cterm-for-react/static/js/main.a8b9b074.chunk.js",
+    "main.js.map": "/cterm-for-react/static/js/main.a8b9b074.chunk.js.map",
     "runtime-main.js": "/cterm-for-react/static/js/runtime-main.8e85cb49.js",
     "runtime-main.js.map": "/cterm-for-react/static/js/runtime-main.8e85cb49.js.map",
-    "static/js/2.f083983d.chunk.js": "/cterm-for-react/static/js/2.f083983d.chunk.js",
-    "static/js/2.f083983d.chunk.js.map": "/cterm-for-react/static/js/2.f083983d.chunk.js.map",
+    "static/js/2.9a885567.chunk.js": "/cterm-for-react/static/js/2.9a885567.chunk.js",
+    "static/js/2.9a885567.chunk.js.map": "/cterm-for-react/static/js/2.9a885567.chunk.js.map",
     "index.html": "/cterm-for-react/index.html",
-    "static/js/2.f083983d.chunk.js.LICENSE.txt": "/cterm-for-react/static/js/2.f083983d.chunk.js.LICENSE.txt"
+    "static/js/2.9a885567.chunk.js.LICENSE.txt": "/cterm-for-react/static/js/2.9a885567.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.8e85cb49.js",
-    "static/js/2.f083983d.chunk.js",
-    "static/js/main.f1714a60.chunk.js"
+    "static/js/2.9a885567.chunk.js",
+    "static/js/main.a8b9b074.chunk.js"
   ]
 }
