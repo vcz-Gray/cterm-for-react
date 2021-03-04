@@ -1,14 +1,14 @@
 {
   "name": "cterm-for-react",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": {
-    "name": "Gray Gyuha Park",
-    "email": "gyuhapark11@gmail.com",
-    "url": "https://www.linkedin.com/in/gyuhapark/"
-  },
+      "name": "Gray Gyuha Park",
+      "email": "gyuhapark11@gmail.com",
+      "url": "https://www.linkedin.com/in/gyuhapark/"
+    },
   "module": "dist/Terminal.js",
   "main": "dist/Terminal.js",
-  "description": "Web terminal for react.js",
+  "description": "Web terminal for reactjs. I tried to develop this component working similar terminal, not for real. This terminal is just looks like terminal. It doesn't communicate other server or something like outside of broswer stuff.",
   "babel": {
     "presets": [
       "@babel/preset-react"
@@ -19,7 +19,14 @@
     "web terminal",
     "terminal for web",
     "component",
-    "terminal component"
+    "terminal component",
+    "web",
+    "xterm",
+    "xterm-for-react",
+    "term for web",
+    "term for react",
+    "react",
+    "term"
   ],
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -68,5 +75,13 @@
     "parser": "babel-eslint",
     "ignore": ["*.json", "node_modules/"]
   },
-  "homepage": "https://quepark.github.io/cterm-for-react"
+  "bugs": {
+    "url": "https://quepark.github.io/cterm-for-react/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://quepark.github.io/cterm-for-react.git"
+  },
+  "license": "MIT",
+  "homepage": "https://quepark.github.io/cterm-for-react#readme"
 }
