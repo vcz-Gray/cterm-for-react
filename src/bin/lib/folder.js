@@ -1,113 +1,231 @@
+const addStrZero = (num) => (num < 10 ? '0' + String(num) : String(num));
+
+const modifyDate = (date) => {
+	const mo = date.getMonth() + 1;
+	const dd = date.getDate();
+	const hh = date.getHours();
+	const mm = date.getMinutes();
+	return ` ${mo} ${dd} ${addStrZero(hh)}:${addStrZero(mm)}`;
+};
+
 class File {
-	constructor(filename) {
+	constructor({ permission, owner, ownerGroup, fileSize, updatedDate, key }) {
 		this.name = '';
-		if (filename.length > 0) {
-			this.name = filename;
-		}
 		this.contents = '';
+		this.permission = permission || '-rwxrwxrwx';
+		if (key.length > 0) {
+			this.name = key;
+		}
+		this.link = [];
+		this.owner = owner || '';
+		this.ownerGroup = ownerGroup || 'staff';
+		this.fileSize = fileSize || 2048;
+		this.updatedDate = updatedDate || modifyDate(new Date());
+		this.isFile = true;
 	}
 
-	addContents(str) {
+	addContents = (str) => {
 		this.contents = str;
-	}
+	};
 }
 
 class Folder {
-	constructor(key = '') {
+	constructor({ permission, owner, ownerGroup, fileSize, updatedDate, key }) {
 		this.name = '';
-		this.childFiles = [];
-		this.childFolders = [];
+		this.child = [];
 		this.childLength = 0;
+		this.link = [];
+		this.permission = permission || 'drwxrwxrwx';
 		if (key) {
 			this.name = key;
 		}
+		this.link = [];
+		this.owner = owner || '';
+		this.ownerGroup = ownerGroup || 'staff';
+		this.fileSize = fileSize || 2048;
+		this.updatedDate = updatedDate || modifyDate(new Date());
+		this.isFile = false;
 	}
 
-	appendChildFile(filename) {
+	appendChild = (user, name, isSudo, isFile, setUser, cb) => {
 		if (this.childLength < 6) {
-			if (
-				this.childFiles.includes(filename) ||
-				this.childFolders.includes(filename)
-			) {
-				return new Error('filename is already exist. try another filename.');
+			if (this.child.includes(name)) {
+				cb('\r\n');
+				cb('The name is already exist. try another name.');
+				return;
 			} else {
-				const file = new File(filename);
-				this.childFiles.push(file);
+				let newFileOrFolder;
+				let info = {};
+
+				if (isSudo) {
+					info = {
+						permission: 'rwxrwxrwx',
+						owner: 'root',
+						ownerGroup: 'admin',
+						updatedDate: modifyDate(new Date()),
+					};
+				} else {
+					info = {
+						permission: 'rwxr-xr-x',
+						owner: this.owner,
+						ownerGroup: 'staff',
+						updatedDate: modifyDate(new Date()),
+					};
+				}
+				if (info.key === undefined) info.key = name;
+				if (isFile) {
+					if (info.fileSize === undefined) info.fileSize = 0;
+					newFileOrFolder = new File(info);
+				} else {
+					if (info.fileSize === undefined) info.fileSize = 64;
+					newFileOrFolder = new Folder(info);
+				}
+				this.child.push(newFileOrFolder);
 				this.childLength++;
+				this.fileSize += info.fileSize;
+				user.path[user.path.length - 1] = this;
+				user.nowDir = this;
+				setUser(user);
 			}
 		} else {
-			return new Error(
+			cb('\r\n');
+			cb(
 				'cannot create new file or folder. this directory limited 5 child which is sum of all files and folders',
 			);
+			return;
 		}
-	}
+	};
 
-	appendChildFolder(folderName) {
-		if (this.childLength < 6) {
-			if (
-				this.childFiles.includes(folderName) ||
-				this.childFolders.includes(folderName)
-			) {
-				return new Error(
-					'folder name is already exist. try another folder name.',
-				);
-			} else {
-				const folder = new Folder(folderName);
-				this.childFolders.push(folder);
-				this.childLength++;
-			}
-		} else {
-			return new Error(
-				'cannot create new file or folder. this directory limited 5 child which is sum of all files and folders',
-			);
-		}
-	}
-
-	deleteChildFile(key) {
+	deleteChild = (key, r, f, cb) => {
 		const tmpArr = [];
-		let theFile,
-			fileFlag = false;
-		for (let file of this.childFiles) {
-			if (file.name !== key) {
-				tmpArr.push(file);
+		let tmp;
+		for (let newFileOrFolder of this.child) {
+			if (newFileOrFolder.name !== key) {
+				tmpArr.push(newFileOrFolder);
 			} else {
-				fileFlag = true;
-				theFile = file;
+				tmp = newFileOrFolder;
 			}
 		}
-		if (fileFlag) {
-			this.childFiles = tmpArr;
-			return theFile;
+		if (!!tmp) {
+			if (tmp.isFile) {
+				this.child = tmpArr;
+				this.childLength--;
+				return tmp;
+			} else {
+				if (r && f) {
+					this.child = tmpArr;
+					this.childLength--;
+					return tmp;
+				} else {
+					if (r && !f) {
+						const tempArr = [];
+						for (let temp of tmp.child) {
+							if (temp.isFile) {
+								tempArr.push(temp);
+							} else {
+								cb('\r\n');
+								cb(
+									`cannot delete this folder. it's not empty. please try -rf option.`,
+								);
+								return;
+							}
+						}
+						this.child = tmpArr;
+						this.childLength--;
+						return tmp;
+					}
+					if (f && !r) {
+						for (let file of tmp.child) {
+							if (file.permission.slice(0, 4) !== '-rwx') {
+								cb('\r\n');
+								cb(
+									`cannot delete this folder. found folder. check permission or please try -rf option.`,
+								);
+								return;
+							}
+						}
+						this.child = tmpArr;
+						this.childLength--;
+						return tmp;
+					}
+				}
+			}
 		} else {
-			return new Error(`cannot find the file named "${key}"`);
+			cb('\r\n');
+			cb(`cannot find the file named "${key}"`);
+			return;
 		}
-	}
-
-	deleteChildFolder(key) {
-		const tmpArr = [];
-		let theFolder,
-			folderFlag = false;
-		for (let folder of this.childFolders) {
-			if (folder.name !== key) {
-				tmpArr.push(folder);
-			} else {
-				folderFlag = true;
-				theFolder = folder;
-			}
-		}
-		if (folderFlag) {
-			if (theFolder.childLength === 0) {
-				this.childFiles = tmpArr;
-				return theFolder;
-			} else {
-				new Error(`cannot delete this folder. it's not empty.`);
-			}
-		} else {
-			return new Error(`cannot find the file named "${key}"`);
-		}
-	}
+	};
 }
 
-const createFolder = (key = 'codestates') => new Folder(key);
+const createFile = (user, key = 'codestates') => {
+	const data = {};
+	if (user.isSudo) {
+		if (data.owner === undefined) {
+			data.owner = 'root';
+		}
+		if (data.permission === undefined) {
+			data.permission = 'drwxrwxrwx';
+		}
+		if (data.ownerGroup === undefined) {
+			data.ownerGroup = 'admin';
+		}
+	} else {
+		if (data.owner === undefined) {
+			data.owner = user.githubUserName;
+		}
+		if (data.permission === undefined) {
+			data.permission = 'drwxr-xr-x';
+		}
+		if (data.ownerGroup === undefined) {
+			data.ownerGroup = 'staff';
+		}
+	}
+	if (data.fileSize === undefined) {
+		data.fileSize = 0;
+	}
+	if (data.updatedDate === undefined) {
+		data.updatedDate = modifyDate(new Date());
+	}
+	if (data.key === undefined) {
+		data.key = key;
+	}
+	return new File(data);
+};
 
-export { createFolder, Folder, File };
+const createFolder = (user, key = 'codestates') => {
+	const data = {};
+	if (user.isSudo) {
+		if (data.owner === undefined) {
+			data.owner = 'root';
+		}
+		if (data.permission === undefined) {
+			data.permission = 'drwxrwxrwx';
+		}
+		if (data.ownerGroup === undefined) {
+			data.ownerGroup = 'admin';
+		}
+	} else {
+		if (data.owner === undefined) {
+			data.owner = user.githubUserName;
+		}
+		if (data.permission === undefined) {
+			data.permission = 'drwxr-xr-x';
+		}
+		if (data.ownerGroup === undefined) {
+			data.ownerGroup = 'staff';
+		}
+	}
+	if (data.fileSize === undefined) {
+		data.fileSize = 64;
+	}
+	if (data.updatedDate === undefined) {
+		data.updatedDate = modifyDate(new Date());
+	}
+	if (data.key === undefined) {
+		data.key = key;
+	}
+	return new Folder(data);
+};
+
+export { createFile, createFolder, Folder, File };

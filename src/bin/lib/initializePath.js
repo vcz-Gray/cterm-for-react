@@ -8,15 +8,20 @@ const isUserPath = (githubUserName, path) => {
 };
 
 const initializePath = (user) => {
+	const userFolder = createFolder(user, user.githubUserName);
 	if (user.path === undefined) {
-		user.path = [createFolder('home'), createFolder(user.githubUserName)];
+		const home = createFolder(user, 'home');
+		user.path = [home, userFolder];
 	}
 	if (user.dirPath.length === 0) {
 		user.dirPath = ['home', user.githubUserName];
 	}
+	if (user.nowDir === undefined) {
+		user.nowDir = user.path[1];
+	}
 	return user;
 };
 
-const getRoot = () => createFolder('/');
+const getRoot = (user) => createFolder(user, '/');
 
 export { initializePath, isUserPath, getRoot };
