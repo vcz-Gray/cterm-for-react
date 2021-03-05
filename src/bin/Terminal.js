@@ -57,8 +57,7 @@ function Terminal({ setCommandLine, setUserInfo, userInfo }) {
 				const options = optionCmd.split('');
 				const [a, l] = [options.includes('a'), options.includes('l')];
 				if (a && l) {
-					cb('\r\n');
-					cb('Total ' + user.nowDir.childLength + '\r\n');
+					cb('Total ' + user.nowDir.childLength);
 					for (let fileOrFolder of user.nowDir.child) {
 						const {
 							permission,
@@ -68,18 +67,15 @@ function Terminal({ setCommandLine, setUserInfo, userInfo }) {
 							updatedDate,
 							name,
 						} = fileOrFolder;
-						cb('\r\n');
 						cb(
 							`${permission} ${link} ${owner} ${ownerGroup} ${updatedDate} ${name}`,
 						);
 					}
 				} else if (a) {
 					for (let fileOrFolder of user.nowDir.child) {
-						cb('\r\n');
 						cb(fileOrFolder.name + '    ');
 					}
 				} else if (l) {
-					cb('\r\n');
 					cb('Total ' + user.nowDir.childLength);
 					for (let fileOrFolder of user.nowDir.child) {
 						if (fileOrFolder.name[0] !== '.') {
@@ -91,7 +87,6 @@ function Terminal({ setCommandLine, setUserInfo, userInfo }) {
 								updatedDate,
 								name,
 							} = fileOrFolder;
-							cb('\r\n');
 							cb(
 								`${permission} ${link} ${owner} ${ownerGroup} ${updatedDate} ${name}`,
 							);
@@ -136,7 +131,9 @@ function Terminal({ setCommandLine, setUserInfo, userInfo }) {
 	const keyboardEventHandler = ({ domEvent }) => {
 		const { key } = domEvent;
 		if (key === 'Enter') {
-			doCommand(commandLine, writeTerminal);
+			if (commandLine) {
+				doCommand(commandLine, writeTerminal);
+			}
 			setTwoCmdLine('');
 			clearPrompt();
 		} else if (key === 'Backspace') {

@@ -19,14 +19,15 @@ class File {
 		this.link = [];
 		this.owner = owner || '';
 		this.ownerGroup = ownerGroup || 'staff';
-		this.fileSize = fileSize || 2048;
+		this.fileSize = fileSize || 0;
 		this.updatedDate = updatedDate || modifyDate(new Date());
 		this.isFile = true;
+		this.addContents = this.addContents.bind(this);
 	}
 
-	addContents = (str) => {
+	addContents(str) {
 		this.contents = str;
-	};
+	}
 }
 
 class Folder {
@@ -45,11 +46,23 @@ class Folder {
 		this.fileSize = fileSize || 2048;
 		this.updatedDate = updatedDate || modifyDate(new Date());
 		this.isFile = false;
+		this.appendChild = this.appendChild.bind(this);
+		this.deleteChild = this.deleteChild.bind(this);
+		this.hasChild = this.hasChild.bind(this);
 	}
 
-	appendChild = (user, name, isSudo, isFile, setUser, cb) => {
+	hasChild(name) {
+		for (let child of this.child) {
+			if (child.name === name) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	appendChild(user, name, isSudo, isFile, setUser, cb) {
 		if (this.childLength < 6) {
-			if (this.child.includes(name)) {
+			if (this.hasChild(name)) {
 				cb('\r\n');
 				cb('The name is already exist. try another name.');
 				return;
@@ -62,17 +75,17 @@ class Folder {
 						permission: 'rwxrwxrwx',
 						owner: 'root',
 						ownerGroup: 'admin',
-						updatedDate: modifyDate(new Date()),
 					};
 				} else {
 					info = {
 						permission: 'rwxr-xr-x',
 						owner: this.owner,
 						ownerGroup: 'staff',
-						updatedDate: modifyDate(new Date()),
 					};
 				}
 				if (info.key === undefined) info.key = name;
+				if (info.updatedDate === undefined)
+					info.updatedDate = modifyDate(new Date());
 				if (isFile) {
 					if (info.fileSize === undefined) info.fileSize = 0;
 					newFileOrFolder = new File(info);
@@ -94,9 +107,9 @@ class Folder {
 			);
 			return;
 		}
-	};
+	}
 
-	deleteChild = (key, r, f, cb) => {
+	deleteChild(key, r, f, cb) {
 		const tmpArr = [];
 		let tmp;
 		for (let newFileOrFolder of this.child) {
@@ -155,7 +168,7 @@ class Folder {
 			cb(`cannot find the file named "${key}"`);
 			return;
 		}
-	};
+	}
 }
 
 const createFile = (user, key = 'codestates') => {

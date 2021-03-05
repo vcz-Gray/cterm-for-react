@@ -24,6 +24,7 @@ const objCmd = (line, user, setUser, cb) => {
 		lineArr.shift();
 	}
 	const [command, ...args] = line.split(' ');
+	let errorFlag = false;
 	switch (command) {
 		case 'mkdir':
 			if (args.length === 0) {
@@ -31,7 +32,6 @@ const objCmd = (line, user, setUser, cb) => {
 				cb('Enter the folder name you want to create');
 				return;
 			}
-			let errorFlag = false;
 			for (let name of args) {
 				if (user.path[user.path.length - 1].childLength < 6) {
 					user.path[user.path.length - 1].appendChild(
@@ -53,6 +53,38 @@ const objCmd = (line, user, setUser, cb) => {
 					'cannot create new file or folder. this directory limited 5 child which is sum of all files and folders',
 				);
 			}
+			return;
+		case 'touch':
+			if (args.length === 0) {
+				cb('\r\n');
+				cb('Enter the file name you want to create');
+				return;
+			}
+			isFile = true;
+			for (let name of args) {
+				if (user.path[user.path.length - 1].childLength < 6) {
+					user.path[user.path.length - 1].appendChild(
+						user,
+						name,
+						isSudo,
+						isFile,
+						setUser,
+						cb,
+					);
+				} else {
+					errorFlag = true;
+					break;
+				}
+			}
+			if (errorFlag) {
+				cb('\r\n');
+				cb(
+					'cannot create new file or folder. this directory limited 5 child which is sum of all files and folders',
+				);
+			}
+			return;
+		case 'cd':
+			console.log('it will be created by author');
 			return;
 		default:
 			cb('\r\n');
