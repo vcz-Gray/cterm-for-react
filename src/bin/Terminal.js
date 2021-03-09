@@ -29,7 +29,7 @@ function Terminal({ setCmdLine, setUser, userInfo, welcomeText }) {
 	const cmdState = useState('');
 	const commandLine = cmdState[0];
 	if (!setCmdLine) setCmdLine = cmdState[1];
-	const ROOT = getRoot('mkdir root');
+	const ROOT = getRoot(user);
 
 	const nonObjCmd = {
 		PWD: () => ROOT.name + user.dirPath.join('/'),
