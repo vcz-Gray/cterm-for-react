@@ -18,7 +18,7 @@ const initializePath = (user, cb) => {
 		user.dirPath = ['home', user.githubUserName];
 	}
 	if (user.nowDir === undefined) {
-		user.nowDir = user.path[1];
+		user.nowDir = userDir;
 	}
 	return user;
 };

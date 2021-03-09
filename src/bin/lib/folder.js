@@ -119,8 +119,6 @@ class Folder {
 				this.child.push(newFileOrFolder);
 				this.childLength++;
 				this.fileSize += info.fileSize;
-				user.path[user.path.length - 1] = this;
-				user.nowDir = this;
 				if (setUser) {
 					setUser(user);
 				}
