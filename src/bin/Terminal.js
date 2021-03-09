@@ -14,18 +14,7 @@ const welcome = (username = 'codestates') =>
 		'지금부터 Linux & CLI 실습을 시작합니다.',
 	].join('\r\n');
 
-function Terminal({ setCommandLine, setUserInfo, userInfo }) {
-	// set parent's states
-	if (!setCommandLine) {
-		setCommandLine = () => {};
-	}
-	if (!setUserInfo) {
-		setUserInfo = () => {};
-	}
-	const initialUser = initializePath(initializeUser(userInfo));
-	setUserInfo({ ...initialUser });
-	const [user, setUser] = useState(initialUser);
-	const ROOT = getRoot('mkdir root');
+function Terminal({ setCmdLine, setUser, userInfo, welcomeText }) {
 	const xtermRef = useRef(null);
 	const writeTerminal = (tmp) => {
 		xtermRef.current.terminal.writeln(tmp);
@@ -33,6 +22,14 @@ function Terminal({ setCommandLine, setUserInfo, userInfo }) {
 	const newWrite = (tmp) => {
 		xtermRef.current.terminal.write(tmp);
 	};
+	const initialUser = initializePath(initializeUser(userInfo), writeTerminal);
+	const userState = useState(initialUser);
+	const user = userState[0];
+	if (!setUser) setUser = userState[1];
+	const cmdState = useState('');
+	const commandLine = cmdState[0];
+	if (!setCmdLine) setCmdLine = cmdState[1];
+	const ROOT = getRoot('mkdir root');
 
 	const nonObjCmd = {
 		PWD: () => ROOT.name + user.dirPath.join('/'),
@@ -49,8 +46,10 @@ function Terminal({ setCommandLine, setUserInfo, userInfo }) {
 			}
 			return nonObjCmd.PWD();
 		},
-		console: () => {
-			console.log(user);
+		console: () => console.log(user),
+		consoleRoot: () => console.log(ROOT),
+		l: (cb, optionCmd = '') => {
+			nonObjCmd.ls(cb, optionCmd);
 		},
 		ls: (cb, optionCmd = '') => {
 			if (optionCmd && typeof optionCmd === 'string') {
@@ -104,15 +103,9 @@ function Terminal({ setCommandLine, setUserInfo, userInfo }) {
 		},
 	};
 
-	const [commandLine, setCmdLine] = useState('');
 	const clearPrompt = () => {
 		const $ = '$ ';
 		newWrite('\r\n' + nonObjCmd.userPath() + $);
-	};
-
-	const setTwoCmdLine = (str) => {
-		setCmdLine(str);
-		setCommandLine(str);
 	};
 
 	// run command
@@ -134,25 +127,24 @@ function Terminal({ setCommandLine, setUserInfo, userInfo }) {
 			if (commandLine) {
 				doCommand(commandLine, writeTerminal);
 			}
-			setTwoCmdLine('');
+			setCmdLine('');
 			clearPrompt();
 		} else if (key === 'Backspace') {
 			if (commandLine.length > 0) {
 				let cmdLine = commandLine.split('');
 				cmdLine.pop();
 				cmdLine = cmdLine.join('');
-				setTwoCmdLine(cmdLine);
+				setCmdLine(cmdLine);
 				newWrite('\b \b');
 			}
 		} else {
 			setCmdLine(commandLine + key);
-			setCommandLine(commandLine + key);
 			newWrite(key);
 		}
 	};
-	const welcomeText = welcome();
+
 	useEffect(() => {
-		writeTerminal(welcomeText);
+		writeTerminal(welcomeText || welcome(user.githubUserName));
 		clearPrompt();
 	}, []);
 

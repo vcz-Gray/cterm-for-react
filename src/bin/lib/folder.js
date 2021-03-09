@@ -9,17 +9,26 @@ const modifyDate = (date) => {
 };
 
 class File {
-	constructor({ permission, owner, ownerGroup, fileSize, updatedDate, key }) {
+	constructor({
+		permission,
+		owner,
+		ownerGroup,
+		fileSize,
+		updatedDate,
+		key,
+		path,
+	}) {
 		this.name = '';
 		this.contents = '';
 		this.permission = permission || '-rwxrwxrwx';
 		if (key.length > 0) {
 			this.name = key;
 		}
+		this.path = path || [];
 		this.link = [];
 		this.owner = owner || '';
 		this.ownerGroup = ownerGroup || 'staff';
-		this.fileSize = fileSize || 0;
+		this.fileSize = fileSize || this.contents.length;
 		this.updatedDate = updatedDate || modifyDate(new Date());
 		this.isFile = true;
 		this.addContents = this.addContents.bind(this);
@@ -31,7 +40,15 @@ class File {
 }
 
 class Folder {
-	constructor({ permission, owner, ownerGroup, fileSize, updatedDate, key }) {
+	constructor({
+		permission,
+		owner,
+		ownerGroup,
+		fileSize,
+		updatedDate,
+		key,
+		path,
+	}) {
 		this.name = '';
 		this.child = [];
 		this.childLength = 0;
@@ -40,6 +57,7 @@ class Folder {
 		if (key) {
 			this.name = key;
 		}
+		this.path = path || [];
 		this.link = [];
 		this.owner = owner || '';
 		this.ownerGroup = ownerGroup || 'staff';
@@ -98,7 +116,9 @@ class Folder {
 				this.fileSize += info.fileSize;
 				user.path[user.path.length - 1] = this;
 				user.nowDir = this;
-				setUser(user);
+				if (setUser) {
+					setUser(user);
+				}
 			}
 		} else {
 			cb('\r\n');
@@ -240,5 +260,8 @@ const createFolder = (user, key = 'codestates') => {
 	}
 	return new Folder(data);
 };
+
+const findParent = (user, nowDir) =>
+	user.path.length > 2 ? user.path[user.path - 2] : user.path[0];
 
 export { createFile, createFolder, Folder, File };

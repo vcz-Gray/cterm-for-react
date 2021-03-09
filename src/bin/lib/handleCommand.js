@@ -15,37 +15,32 @@ const splitSemi = (str) => {
 	return result;
 };
 
-const objCmd = (line, user, setUser, cb) => {
-	const lineArr = line.split(' ');
-	let isSudo = false,
-		isFile = false;
-	if (lineArr[0] === 'sudo') {
-		isSudo = true;
-		lineArr.shift();
+const doCmd = (isSudo, isFile, user, setUser, cb, command, str) => {
+	if (str.length === 0) {
+		cb(`${command}: no such file or directory: ${str}`);
+		return;
 	}
-	const [command, ...args] = line.split(' ');
+
 	let errorFlag = false;
 	switch (command) {
 		case 'mkdir':
-			if (args.length === 0) {
+			if (str.length === 0) {
 				cb('\r\n');
 				cb('Enter the folder name you want to create');
 				return;
 			}
-			for (let name of args) {
-				if (user.path[user.path.length - 1].childLength < 6) {
-					user.path[user.path.length - 1].appendChild(
-						user,
-						name,
-						isSudo,
-						isFile,
-						setUser,
-						cb,
-					);
-				} else {
-					errorFlag = true;
-					break;
-				}
+			if (user.path[user.path.length - 1].childLength < 6) {
+				user.path[user.path.length - 1].appendChild(
+					user,
+					str,
+					isSudo,
+					isFile,
+					setUser,
+					cb,
+				);
+			} else {
+				errorFlag = true;
+				break;
 			}
 			if (errorFlag) {
 				cb('\r\n');
@@ -55,26 +50,24 @@ const objCmd = (line, user, setUser, cb) => {
 			}
 			return;
 		case 'touch':
-			if (args.length === 0) {
+			if (str.length === 0) {
 				cb('\r\n');
 				cb('Enter the file name you want to create');
 				return;
 			}
 			isFile = true;
-			for (let name of args) {
-				if (user.path[user.path.length - 1].childLength < 6) {
-					user.path[user.path.length - 1].appendChild(
-						user,
-						name,
-						isSudo,
-						isFile,
-						setUser,
-						cb,
-					);
-				} else {
-					errorFlag = true;
-					break;
-				}
+			if (user.path[user.path.length - 1].childLength < 6) {
+				user.path[user.path.length - 1].appendChild(
+					user,
+					str,
+					isSudo,
+					isFile,
+					setUser,
+					cb,
+				);
+			} else {
+				errorFlag = true;
+				break;
 			}
 			if (errorFlag) {
 				cb('\r\n');
@@ -84,12 +77,44 @@ const objCmd = (line, user, setUser, cb) => {
 			}
 			return;
 		case 'cd':
-			console.log('it will be created by author');
+			if (user.nowDir.child.some((x) => !x.isFile && x.name === str)) {
+				const theFolder = user.nowDir.child.filter(
+					(x) => !x.isFile && x.name === str,
+				);
+				user.nowDir = theFolder;
+				user.path.push(user.nowDir);
+				user.dirPath.push(user.nowDir.name);
+				setUser(user);
+			} else {
+				cb('\r\n');
+				cb(
+					'cannot create new file or folder. this directory limited 5 child which is sum of all files and folders',
+				);
+			}
+			return;
+		case 'whoami':
+			cb(user.githubUserName);
 			return;
 		default:
 			cb('\r\n');
 			cb('command not found: ' + command);
 			return;
+	}
+};
+
+const objCmd = (line, user, setUser, cb) => {
+	const lineArr = line.split(' ');
+	let isSudo = false,
+		isFile = false;
+	if (lineArr[0] === 'sudo') {
+		isSudo = true;
+		lineArr.shift();
+	}
+	const [command, ...args] = lineArr;
+	if (args.length > 0) {
+		args.forEach((x) => doCmd(isSudo, isFile, user, setUser, cb, command, x));
+	} else {
+		doCmd(command, ...args);
 	}
 };
 
