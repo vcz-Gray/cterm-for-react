@@ -77,7 +77,7 @@ const doCmd = (isSudo, isFile, user, setUser, cb, command, str) => {
 			}
 			return;
 		case 'cd':
-			if (user.nowDir.child.some((x) => !x.isFile && x.name === str)) {
+			if (user.nowDir.hasChild(str)) {
 				const theFolder = user.nowDir.child.filter(
 					(x) => !x.isFile && x.name === str,
 				);

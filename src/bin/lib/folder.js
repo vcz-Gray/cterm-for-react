@@ -67,6 +67,11 @@ class Folder {
 		this.appendChild = this.appendChild.bind(this);
 		this.deleteChild = this.deleteChild.bind(this);
 		this.hasChild = this.hasChild.bind(this);
+		this.addChild = this.addChild.bind(this);
+	}
+
+	addChild(child) {
+		this.child.push(child);
 	}
 
 	hasChild(name) {

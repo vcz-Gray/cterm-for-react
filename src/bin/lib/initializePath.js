@@ -9,9 +9,10 @@ const isUserPath = (githubUserName, path) => {
 
 const initializePath = (user, cb) => {
 	const home = createFolder(user, 'home');
-	home.appendChild(user, user.githubUserName, true, false, null, cb);
+	const userDir = createFolder(user, user.githubUserName);
+	home.addChild(userDir);
 	if (user.path === undefined) {
-		user.path = [home, home.child[0]];
+		user.path = [home, userDir];
 	}
 	if (user.dirPath.length === 0) {
 		user.dirPath = ['home', user.githubUserName];
@@ -24,7 +25,8 @@ const initializePath = (user, cb) => {
 
 const getRoot = (user) => {
 	const rootFolder = createFolder(user, '/');
-	rootFolder.child = user.path;
+	user.path.forEach((x) => rootFolder.addChild(x));
+	return rootFolder;
 };
 
 export { initializePath, isUserPath, getRoot };
