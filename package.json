@@ -1,6 +1,6 @@
 {
   "name": "cterm-for-react",
-  "version": "0.0.15",
+  "version": "0.1.2",
   "author": {
       "name": "Gray Gyuha Park",
       "email": "gyuhapark11@gmail.com",
@@ -80,7 +80,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://quepark.github.io/cterm-for-react.git"
+    "url": "https://quepark.github.io/cterm-for-react.git"
   },
   "license": "MIT",
   "homepage": "https://quepark.github.io/cterm-for-react#readme"

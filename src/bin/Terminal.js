@@ -37,6 +37,7 @@ function Terminal({ setCmdLine, setUser, userInfo, welcomeText }) {
 			cb('\r\n');
 			cb(ROOT.name + user.dirPath.join('/'));
 		},
+		whoami: (cb) => cb(user.githubUserName + '\r\n'),
 		userPath: () => {
 			if (isUserPath(user.githubUserName, user.dirPath)) {
 				const copyPath = [...user.dirPath];

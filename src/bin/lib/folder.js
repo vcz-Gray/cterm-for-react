@@ -68,6 +68,7 @@ class Folder {
 		this.deleteChild = this.deleteChild.bind(this);
 		this.hasChild = this.hasChild.bind(this);
 		this.addChild = this.addChild.bind(this);
+		this.getChild = this.getChild.bind(this);
 	}
 
 	addChild(child) {
@@ -81,6 +82,15 @@ class Folder {
 			}
 		}
 		return false;
+	}
+
+	getChild(name) {
+		for (let child of this.child) {
+			if (child.name === name) {
+				return child;
+			}
+		}
+		return null;
 	}
 
 	appendChild(user, name, isSudo, isFile, setUser, cb) {
