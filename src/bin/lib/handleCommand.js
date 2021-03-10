@@ -65,7 +65,7 @@ const cmdObj = {
 			messages.push('rm file ...');
 		} else {
 			const newChildren = [];
-			for (let child of user.nowDir) {
+			for (let child of user.nowDir.child) {
 				if (!args.includes(child.name)) {
 					newChildren.push(child);
 				}
@@ -78,38 +78,42 @@ const cmdObj = {
 	},
 	echo: (isSudo, isFile, user, setUser, cb, command, ...args) => {
 		let messages = [];
-		const inputFile = args.lastIndexOf('>>');
-		let filename = '',
-			targetFile;
-		if (inputFile !== -1) {
-			filename = args[args.length - 1];
+		const inputFile = args.lastIndexOf('>');
+		const addLine = args.lastIndexOf('>>');
+		let filename =
+				inputFile !== -1 || addLine !== -1 ? args[args.length - 1] : '',
 			targetFile = user.nowDir.getChild(filename);
+		if (inputFile === -1 && addLine === -1) {
+			messages.push('\r\n' + args.join(' '));
+			return messages;
 		}
-		if (filename && targetFile) {
+
+		if (filename && targetFile && inputFile !== -1 && addLine === -1) {
 			args = args.slice(0, inputFile);
 			targetFile.contents = args.join(' ');
+			messages.push('\r\n' + targetFile.contents);
 		}
-		messages.push(args.join(' '));
+		if (filename && targetFile && inputFile === -1 && addLine !== -1) {
+			args = args.slice(0, addLine);
+			targetFile.contents = targetFile.contents + '\r\n' + args.join(' ');
+			messages.push('\r\n' + targetFile.contents);
+		}
 		return messages;
 	},
 	cat: (isSudo, isFile, user, setUser, cb, command, ...args) => {
 		let messages = [];
 		const { contents } = user.nowDir.getChild(args[0]);
 		if (contents) {
-			messages.push(contents);
+			messages.push('\r\n' + contents);
 		} else {
 			messages.push('No such file or directory');
 		}
 		return messages;
 	},
-	touch: (isSudo, isFile, user, setUser, cb, command, ...args) => {
-		let messages = [];
-		return messages;
-	},
-	touch: (isSudo, isFile, user, setUser, cb, command, ...args) => {
-		let messages = [];
-		return messages;
-	},
+	// touch: (isSudo, isFile, user, setUser, cb, command, ...args) => {
+	// 	let messages = [];
+	// 	return messages;
+	// },
 };
 
 const splitSemi = (str) => {
@@ -153,7 +157,7 @@ const objCmd = (line, user, setUser, cb) => {
 	}
 	while (messages.length > 0) {
 		const message = messages.shift();
-		cb(messages + '\r\n');
+		cb(message + '\r\n');
 	}
 
 	return;

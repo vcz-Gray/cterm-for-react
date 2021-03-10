@@ -2,4 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Terminal from './bin/Terminal';
 
-ReactDOM.render(<Terminal />, document.getElementById('root'));
+ReactDOM.render(
+	<div>
+		<Terminal />
+	</div>,
+	document.getElementById('root'),
+);
